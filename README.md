@@ -9,7 +9,7 @@ animation = BA_AnimationLoad("filename");
 ```
 
 Step event:
-loop = 1;
 ```
+loop = 1;
 BA_AnimationPlay(skeleton, animation, loop);
 ```
