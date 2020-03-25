@@ -1,5 +1,5 @@
 # BAnimator
-Game maker bone animation
+Game maker skeleton animation
 
 Copyright (c) 2020. DigitalRealms (Banebyte)
 
