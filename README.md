@@ -1,6 +1,8 @@
 # BAnimator
 Game maker skeleton animation
 
+Use free but give credits
+
 Copyright (c) 2020. DigitalRealms (Banebyte)
 
 # Usage
