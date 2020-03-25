@@ -1,5 +1,6 @@
 # Animator
 Game maker bone animation
+Copyright (c) 2020. DigitalRealms (Banebyte)
 
 # Usage
 Create event:
