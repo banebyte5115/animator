@@ -67,7 +67,7 @@ skeleton = argument0;
 anim = argument1;
 loop = argument2;
 
-if (anim == 0) {
+if (anim == -1) {
     return 0;
 }
 
