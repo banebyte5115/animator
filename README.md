@@ -15,3 +15,5 @@ Step event:
 loop = 1;
 BA_AnimationPlay(skeleton, animation, loop);
 ```
+# Animation creating tool
+Buy animation creating tool for 1$ - https://digitalrealms.itch.io/banimator
