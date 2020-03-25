@@ -67,6 +67,10 @@ skeleton = argument0;
 anim = argument1;
 loop = argument2;
 
+if (anim == 0) {
+    return 0;
+}
+
 var tick, frame, frames, highest_speed;
 tick = BA_AnimationGetTick(anim);
 frame = BA_AnimationGetFrame(anim);
@@ -415,11 +419,21 @@ for (i = 0; i < bsk_bones; i += 1) {
     bone_y = (file_bin_read_byte(file)<<8)|file_bin_read_byte(file);
     bone_parent = file_bin_read_byte(file);
     bone_childs = file_bin_read_byte(file);
+    bone_usesprite = file_bin_read_byte(file);
+    bone_sprite = file_bin_read_byte(file);
     ds_map_add(map, "bone"+string(bone_id)+"x", bone_x);
     ds_map_add(map, "bone"+string(bone_id)+"y", bone_y);
     ds_map_add(map, "bone"+string(bone_id)+"parent", bone_parent);
     ds_map_add(map, "bone"+string(bone_id)+"childs", bone_childs);
-    ds_map_add(map, "bone"+string(bone_id)+"sprite", -1);
+    if (bone_usesprite == 0) {
+        ds_map_add(map, "bone"+string(bone_id)+"sprite", -1);
+    } else {
+        if (bone_sprite < sprites) {
+            ds_map_add(map, "bone"+string(bone_id)+"sprite", bone_sprite);
+        } else {
+            ds_map_add(map, "bone"+string(bone_id)+"sprite", -1);
+        }
+    }
     ds_map_add(map, "bone"+string(bone_id)+"angle", 0);
     ds_map_add(map, "bone"+string(bone_id)+"meta", 0);
     var j;
