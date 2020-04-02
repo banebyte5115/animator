@@ -246,6 +246,20 @@ semantic = argument1;
 
 return ds_map_find_value(map, string(semantic));
 
+#define BA_BoneGetX
+var map, bone_id;
+map = argument0;
+bone_id = argument1;
+
+return ds_map_find_value(map, "bone"+string(bone_id)+"x");
+
+#define BA_BoneGetY
+var map, bone_id;
+map = argument0;
+bone_id = argument1;
+
+return ds_map_find_value(map, "bone"+string(bone_id)+"y");
+
 #define BA_BoneRotate
 var map, bone_id, angle;
 map = argument0;
@@ -318,6 +332,25 @@ for (i = 0; i < bone_childs; i += 1) {
     BA_BoneMove(map, bone_child_id, xx, yy);
 }
 
+#define BA_BoneFlip
+var map, bone_id, flip_val;
+map = argument0;
+bone_id = argument1;
+flip_val = argument2;
+
+ds_map_replace(map, "flip"+string(bone_id), flip_val);
+
+#define BA_BoneFlipAll
+var map, flip_val;
+map = argument0;
+flip_val = argument1;
+
+var i, bones;
+bones = ds_map_find_value(map, "bones");
+for (i = 0; i < bones; i += 1) {
+    ds_map_replace(map, "flip"+string(i), flip_val);
+}
+
 #define BA_BoneSetSprite
 var map, bone_id, sprite;
 map = argument0;
@@ -341,6 +374,50 @@ bone_id = argument1;
 semantic = argument2;
 
 ds_map_replace(map, string(semantic), bone_id);
+
+#define BA_BoneSetPosition
+var map, bone_id;
+map = argument0;
+bone_id = argument1;
+
+var parent, parent_x, parent_y, offset_x, offset_y;
+parent = ds_map_find_value(map, "bone"+string(bone_id)+"parent");
+parent_x = ds_map_find_value(map, "bone"+string(parent)+"x");
+parent_y = ds_map_find_value(map, "bone"+string(parent)+"y");
+offset_x = ds_map_find_value(map, "bone"+string(bone_id)+"offsetx");
+offset_y = ds_map_find_value(map, "bone"+string(bone_id)+"offsety");
+
+ds_map_replace(map, "bone"+string(bone_id)+"x", parent_x + offset_x);
+ds_map_replace(map, "bone"+string(bone_id)+"y", parent_y + offset_y);
+
+var i, childs;
+childs = ds_map_find_value(map, "bone"+string(bone_id)+"childs");
+for (i = 0; i < childs; i += 1) {
+    var child_id;
+    child_id = ds_map_find_value(map, "bone"+string(bone_id)+"child"+string(i));
+}
+
+#define BA_BoneSetAngle
+var map, bone_id, angle;
+map = argument0;
+bone_id = argument1;
+angle = argument2;
+
+ds_map_replace(map, "bone"+string(bone_id)+"angle", angle);
+
+#define BA_BoneSetDepth
+var map, bone_id, dval;
+map = argument0;
+bone_id = argument1;
+dval = argument2;
+
+var bones;
+bones = ds_map_find_value(map, "bones");
+if (dval >= bones) {
+    dval = bones - 1;
+}
+
+ds_map_replace(map, "depth"+string(dval), bone_id);
 
 #define BA_BoneAddDepth
 var map, bone_id;
@@ -428,11 +505,7 @@ for (i = 0; i < bsk_bones; i += 1) {
     if (bone_usesprite == 0) {
         ds_map_add(map, "bone"+string(bone_id)+"sprite", -1);
     } else {
-        if (bone_sprite < sprites) {
-            ds_map_add(map, "bone"+string(bone_id)+"sprite", bone_sprite);
-        } else {
-            ds_map_add(map, "bone"+string(bone_id)+"sprite", -1);
-        }
+        ds_map_add(map, "bone"+string(bone_id)+"sprite", -1);
     }
     ds_map_add(map, "bone"+string(bone_id)+"angle", 0);
     ds_map_add(map, "bone"+string(bone_id)+"meta", 0);
@@ -443,6 +516,7 @@ for (i = 0; i < bsk_bones; i += 1) {
         ds_map_add(map, "bone"+string(bone_id)+"child"+string(j), child_id);
     }
     ds_map_add(map, "depth"+string(i), bone_id);
+    ds_map_add(map, "flip"+string(i), 1);
 }
 
 for (i = 0; i < bsk_bones; i += 1) {
@@ -480,11 +554,12 @@ for (j = 0; j < bones; j += 1) {
     var sprite;
     sprite = ds_map_find_value(map, "bone"+string(i)+"sprite");
     if (sprite != -1) {
-        var xx, yy, angle;
+        var xx, yy, angle, flip;
         xx = ds_map_find_value(map, "bone"+string(i)+"x");
         yy = ds_map_find_value(map, "bone"+string(i)+"y");
         angle = ds_map_find_value(map, "bone"+string(i)+"angle");
-        draw_sprite_ext(sprite, 0, xx, yy, 1, 1, angle, c_white, 1);
+        flip = ds_map_find_value(map, "flip"+string(i));
+        draw_sprite_ext(sprite, 0, xx, yy, flip, 1, angle, c_white, 1);
     }
 }
 
@@ -504,6 +579,23 @@ for (i = 0; i < bones; i += 1) {
 }
 
 return 1;
+
+#define BA_SkeletonSetPosition
+var map, bone_id, xx, yy;
+map = argument0;
+bone_id = argument1;
+xx = argument2;
+yy = argument3;
+
+var i, childs;
+ds_map_replace(skeleton, "bone"+string(bone_id)+"x", xx);
+ds_map_replace(skeleton, "bone"+string(bone_id)+"y", yy);
+childs = ds_map_find_value(map, "bone"+string(bone_id)+"childs");
+for (i = 0; i < childs; i += 1) {
+    var child_id;
+    child_id = ds_map_find_value(map, "bone"+string(bone_id)+"child"+string(i));
+    BA_BoneSetPosition(skeleton, child_id);
+}
 
 #define BA_SkeletonDelete
 var map;
